@@ -5,6 +5,7 @@
  * @return \Swoole\Process
  */
 
+use Doctrine\DBAL\DriverManager;
 use function Swoole\Coroutine\Http\post;
 
 $process = function (&$http) {
@@ -20,11 +21,27 @@ $process = function (&$http) {
                 $http->table->del($key);
             }
             if (count($keys)) {
-                foreach ($data as $dir => $msg) {
-                    $target_dir = '/var/data/' . $dir . '/';
-                    file_exists($target_dir) || mkdir($target_dir);
-                    $file =  $target_dir . date('Y-m-d') . '.txt';
-                    file_put_contents($file, implode("\n", $msg) . "\n", FILE_APPEND);
+                // 写入数据库
+                $connectionParams = [
+                    'dbname' => 'xidog',
+                    'user' => 'root',
+                    'password' => '123123',
+                    'host' => 'mysql',
+                    'driver' => 'pdo_mysql',
+                ];
+                $conn = DriverManager::getConnection($connectionParams);
+                foreach ($data as $value) {
+                    foreach ($value as $val) {
+                        $item = explode('=|=', $val);
+                        $arr = [
+                            'ip' => $item[0],
+                            'user_agent' => $item[1],
+                            'add_time' => $item[2],
+                            'type' => $item[3]
+                        ];
+                        var_dump($item);
+                        $conn->insert('xg_access_log', $arr);
+                    }
                 }
             }
         });
@@ -39,6 +56,12 @@ $process = function (&$http) {
                     for ($index = $http->setting['worker_num'] - 1; $index >= 0; $index--) {
                         $http->sendMessage($arr, $index);
                     }
+                    $http->table->set(time(), [
+                        'ip'   => '192.168.1.1',
+                        'ua'   => 'none',
+                        'type' => 'test',
+                        'time' => time()
+                    ]);
                 } catch (Throwable $exception) {
                     colorLog('定时推送出错:' . $exception->getMessage());
                 }

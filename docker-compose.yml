@@ -3,6 +3,7 @@ version: '3'
 services:
   # nginx:
   #   image: nginx
+  #   container_name: nginx
   #   links:
   #     - app
   #   ports:
@@ -17,10 +18,14 @@ services:
   #       max-file: "10"
   app:
     image: phpswoole/swoole
+    container_name: app
+    depends_on:
+      - mysql
     environment:
       AUTORELOAD_PROGRAMS: "swoole"
       AUTORELOAD_ANY_FILES: 1
       SERVER_NAME: "$SERVER_NAME"
+      TZ: "$TZ"
     volumes:
       - ./app:/var/www
       - ./public/:/var/html
@@ -34,3 +39,33 @@ services:
       options:
         max-size: "20M"
         max-file: "10"
+
+  mysql:
+    image: mariadb:10.5.8
+    container_name: mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: "$MYSQL_ROOT_PASSWORD"
+      TZ: "$TZ"
+    volumes:
+      - ./docker/data/mysql:/var/lib/mysql
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    container_name: phpmyadmin
+    ports:
+      - "888:80"
+    networks:
+      - default
+    environment:
+      - PMA_HOST=mysql
+      - PMA_PORT=3306
+      - TZ=$TZ
+
+  # redis:
+  #   image: redis:alpine3.14
+  #   container_name: redis
+  #   restart: always
+  #   volumes:
+  #     - ./docker/data/redis:/data
+  #   command: redis-server --appendonly yes

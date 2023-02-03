@@ -6,5 +6,7 @@
             "App\\": "."
         }
     },
-    "require": {}
+    "require": {
+        "doctrine/dbal": "^3.3"
+    }
 }
