@@ -8,3 +8,4 @@ vscode/vscode/*
 !vscode/vscode/.gitkeep
 config/*
 !config/.gitkeep
+docker/data/*

@@ -12,7 +12,8 @@
 
 $baseRoute = [
     'index' => [
-        '/hello' => 'index'
+        '/hello' => 'index',
+        '/test'  => 'test',
     ]
 ];
 

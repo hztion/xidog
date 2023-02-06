@@ -20,11 +20,11 @@ if (function_exists('remember') === false) {
 }
 
 if (function_exists('encrypt') === false) {
-    function encrypt($string, $operation, $key = '')
+    function encrypt($string, $key = '')
     {
         $key = md5($key);
         $key_length = strlen($key);
-        $string = $operation == 'D' ? base64_decode($string) : substr(md5($string . $key), 0, 8) . $string;
+        $string = substr(md5($string . $key), 0, 8) . $string;
         $string_length = strlen($string);
         $rndkey = $box = array();
         $result = '';
@@ -46,15 +46,7 @@ if (function_exists('encrypt') === false) {
             $box[$j] = $tmp;
             $result .= chr(ord($string[$i]) ^ ($box[($box[$a] + $box[$j]) % 256]));
         }
-        if ($operation == 'D') {
-            if (substr($result, 0, 8) == substr(md5(substr($result, 8) . $key), 0, 8)) {
-                return substr($result, 8);
-            } else {
-                return '';
-            }
-        } else {
-            return str_replace(['=', '+'], ['', '-'], base64_encode($result));
-        }
+        return str_replace(['=', '+'], ['', '-'], base64_encode($result));
     }
 }
 
@@ -106,5 +98,19 @@ if (!function_exists('rc4')) {
             $res .= $str[$y] ^ chr($s[($s[$i] + $s[$j]) % 256]);
         }
         return $res;
+    }
+}
+
+if (!function_exists('getRandStr')) {
+    function getRandStr($length = 8)
+    {
+        $str = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_';
+        $len = strlen($str) - 1;
+        $randstr = '';
+        for ($i = 0; $i < $length; $i++) {
+            $num = mt_rand(0, $len);
+            $randstr .= $str[$num];
+        }
+        return $randstr;
     }
 }
