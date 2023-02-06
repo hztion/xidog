@@ -1,0 +1,12 @@
+{
+    "name": "hztion/xidog",
+    "type": "project",
+    "autoload": {
+        "psr-4": {
+            "App\\": "."
+        }
+    },
+    "require": {
+        "doctrine/dbal": "^3.3"
+    }
+}

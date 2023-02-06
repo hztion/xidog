@@ -1,0 +1,11 @@
+.DS_Store
+.idea
+helper
+storage/*
+!storage/.gitkeep
+.env
+vscode/vscode/*
+!vscode/vscode/.gitkeep
+config/*
+!config/.gitkeep
+docker/data/*
